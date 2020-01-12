@@ -64,6 +64,7 @@ void	main_algorithm_loop(t_md5 *data, int i, unsigned int tmp1, unsigned int tmp
 			tmp1 = data->c ^ (data->b | (~data->d));
 			tmp2 = (7 * i) % 16;
 		}
+		swap_and_rotate(data, i, tmp1, tmp2);
 	}
 }
 
