@@ -113,8 +113,8 @@ void 	save_and_update_msg(t_sha256 *dt, unsigned char *input_msg, size_t init_le
 {
 	unsigned int 	i;
 
-	i = -1;
-	while (++i < init_len)
+	i = 0;
+	while (i < init_len)
 	{
 		dt->data[dt->datalen] = input_msg[i];
 		dt->datalen++;
@@ -124,6 +124,7 @@ void 	save_and_update_msg(t_sha256 *dt, unsigned char *input_msg, size_t init_le
 			dt->bitlen += 512;
 			dt->datalen = 0;
 		}
+		i++;
 	}
 }
 
