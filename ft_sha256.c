@@ -101,7 +101,6 @@ void modify_data(t_sha256 *dt)
 		j += 4;
 	}
 
-	i = -1;
 	while (++i < 64)
 		buf[i] = SIG1(buf[i - 2]) + buf[i - 7] + SIG0(buf[i - 15]) + buf[i - 16];
 
@@ -111,7 +110,7 @@ void modify_data(t_sha256 *dt)
 
 void 	save_and_update_msg(t_sha256 *dt, unsigned char *input_msg, size_t init_len)
 {
-	unsigned int 	i;
+	size_t	i;
 
 	i = 0;
 	while (i < init_len)
