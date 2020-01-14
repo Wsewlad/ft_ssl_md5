@@ -14,6 +14,7 @@ int main(int argc, char const *argv[])
 
 	//ssl->hash_func("a");
 	ft_sha256("abc");
+	ft_printf("\n");
 
 	return 0;
 }

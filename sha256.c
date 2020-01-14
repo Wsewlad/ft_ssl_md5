@@ -82,19 +82,19 @@ void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 	ctx->state[7] += h;
 }
 
-// void sha256_init(SHA256_CTX *ctx)
-// {
-// 	ctx->datalen = 0;
-// 	ctx->bitlen = 0;
-// 	ctx->state[0] = 0x6a09e667;
-// 	ctx->state[1] = 0xbb67ae85;
-// 	ctx->state[2] = 0x3c6ef372;
-// 	ctx->state[3] = 0xa54ff53a;
-// 	ctx->state[4] = 0x510e527f;
-// 	ctx->state[5] = 0x9b05688c;
-// 	ctx->state[6] = 0x1f83d9ab;
-// 	ctx->state[7] = 0x5be0cd19;
-// }
+void sha256_init(SHA256_CTX *ctx)
+{
+	ctx->datalen = 0;
+	ctx->bitlen = 0;
+	ctx->state[0] = 0x6a09e667;
+	ctx->state[1] = 0xbb67ae85;
+	ctx->state[2] = 0x3c6ef372;
+	ctx->state[3] = 0xa54ff53a;
+	ctx->state[4] = 0x510e527f;
+	ctx->state[5] = 0x9b05688c;
+	ctx->state[6] = 0x1f83d9ab;
+	ctx->state[7] = 0x5be0cd19;
+}
 
 void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
 {
@@ -158,16 +158,16 @@ void sha256_final(SHA256_CTX *ctx, BYTE hash[])
 }
 
 // print
-void	print_sha256(unsigned char *hash)
-{
-	int  i;
+// void	print_sha256(unsigned char *hash)
+// {
+// 	int  i;
 
-	i = -1
-	while (++i < 32)
-	{
-		printf("%2.2x", hash[i]);
-	}
-}
+// 	i = -1
+// 	while (++i < 32)
+// 	{
+// 		printf("%2.2x", hash[i]);
+// 	}
+// }
 
 // test
 int sha256_test()
@@ -178,10 +178,10 @@ int sha256_test()
 	SHA256_CTX ctx;
 
 	//sha256_init(&ctx);
-	sha256_update(&ctx, text1, strlen(text1));
+	//sha256_update(&ctx, text1, strlen(text1));
 	sha256_final(&ctx, buf);
 
-	print_sha256(buf);
+	//print_sha256(buf);
 	
 	printf("\n");
 

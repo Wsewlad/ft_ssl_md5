@@ -100,7 +100,7 @@ void modify_data(t_sha256 *dt)
 		(dt->data[j + 2] << 8) | (dt->data[j + 3]);
 		j += 4;
 	}
-
+	i -= 1;
 	while (++i < 64)
 		buf[i] = SIG1(buf[i - 2]) + buf[i - 7] + SIG0(buf[i - 15]) + buf[i - 16];
 
