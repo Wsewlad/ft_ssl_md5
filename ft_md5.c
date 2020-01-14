@@ -2,69 +2,69 @@
 
 void	*md5_init(unsigned char *input_msg)
 {
-	t_md5			*data;
+	t_md5			*dt;
 	unsigned int 	init_len;
 	unsigned int 	bits_len;
 
-	data = (t_md5 *)malloc(sizeof(t_md5));
-	data->h[0] = 0x67452301;
-    data->h[1] = 0xefcdab89;
-    data->h[2] = 0x98badcfe;
-    data->h[3] = 0x10325476;
-    data->offset = 0;
+	dt = (t_md5 *)malloc(sizeof(t_md5));
+	dt->h[0] = 0x67452301;
+    dt->h[1] = 0xefcdab89;
+    dt->h[2] = 0x98badcfe;
+    dt->h[3] = 0x10325476;
+    dt->offset = 0;
 
 	init_len = ft_strlen((char *)input_msg);
-	data->new_len = ((((init_len + 8) / 64) + 1) * 64) - 8;
+	dt->new_len = ((((init_len + 8) / 64) + 1) * 64) - 8;
 
-    data->msg = (unsigned char *)ft_strnew(data->new_len + 64);
+    dt->msg = (unsigned char *)ft_strnew(dt->new_len + 64);
 
-    ft_memcpy(data->msg, input_msg, init_len);
-    data->msg[init_len] = 128;
+    ft_memcpy(dt->msg, input_msg, init_len);
+    dt->msg[init_len] = 128;
 
     bits_len = init_len * 8;
-    ft_memcpy(data->msg + data->new_len, &bits_len, 4);
+    ft_memcpy(dt->msg + dt->new_len, &bits_len, 4);
 
-	return data;
+	return dt;
 }
 
 
-void	swap_and_rotate(t_md5 *data, int i, unsigned int tmp1, unsigned int tmp2)
+void	swap_and_rotate(t_md5 *dt, int i, unsigned int tmp1, unsigned int tmp2)
 {
 	unsigned int  z;
 
-	z = data->d;
-	data->d = data->c;
-	data->c = data->b;
-	data->b = data->b + LEFTROTATE((data->a + tmp1 + g_md5_k[i] + data->tmp[tmp2]), g_md5_r[i]);
-	data->a = z;
+	z = dt->d;
+	dt->d = dt->c;
+	dt->c = dt->b;
+	dt->b = dt->b + LEFTROTATE((dt->a + tmp1 + g_md5_k[i] + dt->tmp[tmp2]), g_md5_r[i]);
+	dt->a = z;
 }
 
 
-void	main_algorithm_loop(t_md5 *data, int i, unsigned int tmp1, unsigned int tmp2)
+void	main_algorithm_loop(t_md5 *dt, int i, unsigned int tmp1, unsigned int tmp2)
 {
 	while (++i < 64)
 	{
 		if (i < 16)
 		{
-			tmp1 = (data->b & data->c) | ((~data->b) & data->d);
+			tmp1 = (dt->b & dt->c) | ((~dt->b) & dt->d);
 			tmp2 = i;
 		}
 		else if (i < 32)
 		{
-			tmp1 = (data->d & data->b) | ((~data->d) & data->c);
+			tmp1 = (dt->d & dt->b) | ((~dt->d) & dt->c);
 			tmp2 = (5 * i + 1) % 16;
 		}
 		else if (i < 48)
 		{
-			tmp1 = data->b ^ data->c ^ data->d;
+			tmp1 = dt->b ^ dt->c ^ dt->d;
 			tmp2 = (3 * i + 5) % 16;
 		}
 		else
 		{
-			tmp1 = data->c ^ (data->b | (~data->d));
+			tmp1 = dt->c ^ (dt->b | (~dt->d));
 			tmp2 = (7 * i) % 16;
 		}
-		swap_and_rotate(data, i, tmp1, tmp2);
+		swap_and_rotate(dt, i, tmp1, tmp2);
 	}
 }
 
@@ -83,29 +83,29 @@ void	print_md5(unsigned int h)
 
 void	ft_md5(void *input_msg)
 {
-	t_md5	*d;
+	t_md5	*dt;
 	int 	i;
 
-	d = md5_init((unsigned char *)input_msg);
+	dt = md5_init((unsigned char *)input_msg);
 
-	while (d->offset < d->new_len)
+	while (dt->offset < dt->new_len)
 	{
-		d->tmp = (unsigned int *)(d->msg + d->offset);
+		dt->tmp = (unsigned int *)(dt->msg + dt->offset);
 
-		d->a = d->h[0];
-		d->b = d->h[1];
-		d->c = d->h[2];
-		d->d = d->h[3];
-		main_algorithm_loop(d, -1, 0, 0);
-		d->h[0] += d->a;
-		d->h[1] += d->b;
-		d->h[2] += d->c;
-		d->h[3] += d->d;
+		dt->a = dt->h[0];
+		dt->b = dt->h[1];
+		dt->c = dt->h[2];
+		dt->d = dt->h[3];
+		main_algorithm_loop(dt, -1, 0, 0);
+		dt->h[0] += dt->a;
+		dt->h[1] += dt->b;
+		dt->h[2] += dt->c;
+		dt->h[3] += dt->d;
 
-		d->offset += (512 / 8);
+		dt->offset += (512 / 8);
 	}
-	free(d->msg);
+	free(dt->msg);
 	i = -1;
 	while (++i < 4)
-		print_md5(d->h[i]);
+		print_md5(dt->h[i]);
 }

@@ -12,7 +12,8 @@ int main(int argc, char const *argv[])
 	ssl = (t_ssl *)malloc(sizeof(t_ssl));
 	ssl->hash_func = &ft_md5;
 
-	ssl->hash_func("a");
+	//ssl->hash_func("a");
+	ft_sha256("abc");
 
 	return 0;
 }
