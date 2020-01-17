@@ -1,20 +1,151 @@
 #include "ft_ssl.h"
 
-int main(int argc, char const *argv[])
+int		read_stdin(t_ssl *ssl)
 {
-	(void)argc;
-	(void)argv;
-	char	*testStr;
+	int		fd;
+	char	buff[2];
+	char	*tmp;
+
+	fd = 0;
+	ssl->input_len = 0;
+	ft_memset(buff, 0, 2);
+	ssl->input = ft_strdup("");
+	while (read(fd, buff, 1) > 0)
+	{
+		tmp = ssl->input;
+		ssl->input = ft_strjoin(ssl->input, buff);
+		free(tmp);
+	}
+	ssl->input_len = ft_strlen(ssl->input);
+	return 1;
+}
+
+int		read_file(t_ssl *ssl)
+{
+	int		ret;
+	int		fd;
+	char	c;
+
+	ssl->input_len = 0;
+	if ((fd = open(ssl->file_name, O_RDONLY)) == -1)
+	{
+		ft_printf("ft_ssl: %s: %s: No such file or directory\n",
+			ssl->algorithms[ssl->algo_idx].name, ssl->file_name);
+		return 0;
+	}
+
+	while ((ret = read(fd, &c, 1)))
+		ssl->input_len++;
+
+	ssl->input = (char*)malloc(sizeof(char) * (ssl->input_len));
+	close(fd);
+
+	fd = open(ssl->file_name, O_RDONLY);
+	read(fd, ssl->input, ssl->input_len);
+	close(fd);
+	return 1;
+}
+
+
+int		print_error(char *str, t_ssl *ssl)
+{
+	int i;
+
+	if (str == NULL)
+		ft_putstr("usage: ft_ssl command [command opts] [command args]\n");
+	else
+	{
+		ft_printf("ft_ssl: Error: '%s' is an invalid command.\n", str);
+		ft_putstr("\nStandard commands:\n");
+		ft_putstr("\nMessage Digest commands:\n");
+		i = -1;
+		while (++i < NBR_OF_FUNC)
+			ft_printf("%s\n", ssl->algorithms[i].name);
+		ft_putstr("\nCipher commands:\n");
+	}
+	return 0;
+}
+
+void 	run_command(t_ssl *ssl, int ac, char **av)
+{
+	
+}
+
+void	check_command_opts(t_ssl *ssl, int ac, char **av)
+{
+	int i;
+
+	i = 2;
+	while (i < ac)
+	{
+		if (!ft_strcmp(av[i], "-p"))
+			ssl->flags.p = 1;
+		else if (!ft_strcmp(av[i], "-q"))
+			ssl->flags.q = 1;
+		else if (!ft_strcmp(av[i], "-r"))
+			ssl->flags.r = 1;
+		else
+			break;
+		i++;
+	}
+}
+
+int		is_command_valid(t_ssl *ssl, char *commandName)
+{
+	int i;
+
+	i = -1;
+	while (++i < NBR_OF_FUNC)
+		if (ft_strcmp(commandName, ssl->algorithms[i].name) == 0)
+			ssl->algo_idx = i;
+
+	if (ssl->algo_idx == -1)
+		return print_error(commandName, ssl);
+
+	return 1;
+}
+
+
+t_ssl	*ssl_init()
+{
 	t_ssl	*ssl;
 
-	testStr = "a";
-
 	ssl = (t_ssl *)malloc(sizeof(t_ssl));
-	ssl->hash_func = &ft_md5;
+	ssl->algorithms[0].name = "md5";
+	ssl->algorithms[0].func = &ft_md5;
+	ssl->algorithms[1].name = "sha256";
+	ssl->algorithms[1].func = &ft_sha256;
+	ssl->algo_idx = -1;
+	ssl->flags.p = 0;
+	ssl->flags.q = 0;
+	ssl->flags.r = 0;
+	ssl->flags.s = 0;
+	ssl->input_len = 0;
+	return ssl;
+}
 
-	//ssl->hash_func("a");
-	ft_sha256("abc");
-	ft_printf("\n");
 
+int 	main(int argc, char **argv)
+{
+	t_ssl	*ssl;
+
+	ssl = ssl_init();
+	if (argc < 2)
+		return (print_error(NULL, ssl));
+
+	if (is_command_valid(ssl, argv[1]))
+	{
+		if (argc > 2)
+		{
+			check_command_opts(ssl, argc, argv);
+			run_command(ssl, argc,  argv);
+		}
+		else
+			if (read_stdin(ssl))
+			{
+				ssl->algorithms[ssl->algo_idx].func(ssl->input, ssl->input_len);
+				ft_printf("\n");
+			}
+	}
 	return 0;
 }

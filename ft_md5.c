@@ -1,9 +1,8 @@
 #include "ft_md5.h"
 
-void	*md5_init(unsigned char *input_msg)
+t_md5	*md5_init(char *input_msg, size_t init_len)
 {
 	t_md5			*dt;
-	unsigned int 	init_len;
 	unsigned int 	bits_len;
 
 	dt = (t_md5 *)malloc(sizeof(t_md5));
@@ -13,7 +12,6 @@ void	*md5_init(unsigned char *input_msg)
     dt->h[3] = 0x10325476;
     dt->offset = 0;
 
-	init_len = ft_strlen((char *)input_msg);
 	dt->new_len = ((((init_len + 8) / 64) + 1) * 64) - 8;
 
     dt->msg = (unsigned char *)ft_strnew(dt->new_len + 64);
@@ -81,12 +79,12 @@ void	print_md5(unsigned int h)
 }
 
 
-void	ft_md5(void *input_msg)
+void	ft_md5(char *input_msg, size_t init_len)
 {
 	t_md5	*dt;
 	int 	i;
 
-	dt = md5_init((unsigned char *)input_msg);
+	dt = md5_init(input_msg, init_len);
 
 	while (dt->offset < dt->new_len)
 	{

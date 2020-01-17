@@ -49,8 +49,8 @@ typedef struct 		s_md5
 	size_t			new_len;
 }					t_md5;
 
-void				ft_md5(void *input_msg);
-void				*ft_md5_init(unsigned char *input_msg);
+void				ft_md5(char *input_msg, size_t init_len);
+t_md5				*ft_md5_init(char *input_msg, size_t init_len);
 void				main_algorithm_loop(t_md5 *data, int i, unsigned int tmp1, unsigned int tmp2);
 void				swap_and_rotate(t_md5 *data, int i, unsigned int tmp1, unsigned int tmp2);
 void				print_md5(unsigned int h);

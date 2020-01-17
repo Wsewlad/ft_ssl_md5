@@ -34,8 +34,13 @@ typedef struct 		s_sha256
 
 }					t_sha256;
 
-
+void		ft_sha256(char *input_msg, size_t init_len);
 t_sha256	*sha256_init();
-void	ft_sha256(void *input_msg);
-void	modify_data(t_sha256 *dt);
+void 		save_and_update_msg(t_sha256 *dt, char *input_msg, size_t init_len);
+void		modify_data(t_sha256 *dt);
+void 		swap_and_append_data(t_sha256 *dt, unsigned int *buf);
+void 		get_hash(t_sha256 *dt, unsigned char *hash);
+void		append_length_bits2padding(t_sha256 *dt);
+void		reverse_bytes(t_sha256 *dt, unsigned char *hash);
+
 #endif

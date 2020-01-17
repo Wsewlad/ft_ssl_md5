@@ -11,8 +11,8 @@
 # **************************************************************************** #
 
 NAME	=	ft_ssl
-SRC		=	main.c ft_md5.c ft_sha256.c
-FLAGS	=	-Wall -Wextra -Werror
+SRC		=	main.c ft_md5.c ft_sha256.c ft_sha256_part2.c
+FLAGS	=	-Wall -Wextra -Werror -fsanitize=address
 MYLIB	=	-L libft -lftprintf -I libft
 
 .PHONY: all clean fclean re
