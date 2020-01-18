@@ -16,6 +16,7 @@ typedef struct 		s_flag
 	int				q;
 	int				r;
 	int				s;
+	int 			f;
 }					t_flag;
 
 typedef void	(*t_hash_func)(char *, size_t);

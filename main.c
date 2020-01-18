@@ -20,27 +20,34 @@ int		read_stdin(t_ssl *ssl)
 	return 1;
 }
 
-int		read_file(t_ssl *ssl)
+int		read_file(t_ssl *ssl, char *file_name)
 {
 	int		ret;
 	int		fd;
 	char	c;
 
 	ssl->input_len = 0;
-	if ((fd = open(ssl->file_name, O_RDONLY)) == -1)
+	if ((fd = open(file_name, O_RDONLY)) == -1)
 	{
 		ft_printf("ft_ssl: %s: %s: No such file or directory\n",
-			ssl->algorithms[ssl->algo_idx].name, ssl->file_name);
+			ssl->algorithms[ssl->algo_idx].name, file_name);
 		return 0;
 	}
 
-	while ((ret = read(fd, &c, 1)))
+	while ((ret = read(fd, &c, 1)) > 0)
 		ssl->input_len++;
+	if (ret < 0)
+	{
+		ft_printf("%s: %s: Is a directory\n", 
+			ssl->algorithms[ssl->algo_idx].name, file_name);
+		return 0;
+	}
+
 
 	ssl->input = (char*)malloc(sizeof(char) * (ssl->input_len));
 	close(fd);
 
-	fd = open(ssl->file_name, O_RDONLY);
+	fd = open(file_name, O_RDONLY);
 	read(fd, ssl->input, ssl->input_len);
 	close(fd);
 	return 1;
@@ -66,9 +73,38 @@ int		print_error(char *str, t_ssl *ssl)
 	return 0;
 }
 
-void 	run_command(t_ssl *ssl, int ac, char **av)
+
+// void 	run_command(t_ssl *ssl, int ac, char **av)
+// {
+// 	int i;
+
+// 	i = 2;
+// 	while (i < ac)
+// 	{
+// 		if (!ft_strcmp(av[i], "-p"))
+// 			continue;
+// 		else if (!ft_strcmp(av[i], "-q"))
+// 			continue;
+// 		else if (!ft_strcmp(av[i], "-r"))
+// 			continue;
+// 		else
+			
+// 		i++;
+// 	}
+//}
+char	*ft_str2upper(char *str)
 {
-	
+	int 	i;
+	char	*res;
+
+	i = 0;
+	res = ft_strnew(ft_strlen(str));
+	while (str[i])
+	{
+		res[i] = ft_toupper(str[i]);
+		i++;
+	}
+	return res;
 }
 
 void	check_command_opts(t_ssl *ssl, int ac, char **av)
@@ -78,16 +114,70 @@ void	check_command_opts(t_ssl *ssl, int ac, char **av)
 	i = 2;
 	while (i < ac)
 	{
-		if (!ft_strcmp(av[i], "-p"))
+		if (ssl->flags.f)
+		{
+			if (read_file(ssl, av[i]))
+			{
+				if (!ssl->flags.r && !ssl->flags.q)
+					ft_printf("%s (%s) = ", ft_str2upper(ssl->algorithms[ssl->algo_idx].name), av[i]);
+				ssl->algorithms[ssl->algo_idx].func(ssl->input, ssl->input_len);
+				if (ssl->flags.r && !ssl->flags.q)
+					ft_printf(" %s", av[i]);
+				ft_printf("\n");
+				free(ssl->input);
+			}
+		}
+		else if (!ft_strcmp(av[i], "-p"))
+		{
+			if (read_stdin(ssl))
+			{
+				ft_printf("%s", ssl->input);
+				ssl->algorithms[ssl->algo_idx].func(ssl->input, ssl->input_len);
+				ft_printf("\n");
+				free(ssl->input);
+			}
 			ssl->flags.p = 1;
+		}
 		else if (!ft_strcmp(av[i], "-q"))
 			ssl->flags.q = 1;
 		else if (!ft_strcmp(av[i], "-r"))
 			ssl->flags.r = 1;
+		else if (!ft_strcmp(av[i], "-s"))
+		{
+			if (av[i + 1])
+			{
+				if (!ssl->flags.r && !ssl->flags.q)
+					ft_printf("%s (\"%s\") = ", ft_str2upper(ssl->algorithms[ssl->algo_idx].name), av[i + 1]);
+				ssl->algorithms[ssl->algo_idx].func(av[i + 1], ft_strlen(av[i + 1]));
+				if (ssl->flags.r && !ssl->flags.q)
+					ft_printf(" \"%s\"", av[i + 1]);
+				ft_printf("\n");
+				ssl->flags.s = 1;
+				i++;
+			}
+		}
 		else
-			break;
+		{
+			if (read_file(ssl, av[i]))
+			{
+				if (!ssl->flags.r && !ssl->flags.q)
+					ft_printf("%s (%s) = ", ft_str2upper(ssl->algorithms[ssl->algo_idx].name), av[i]);
+				ssl->algorithms[ssl->algo_idx].func(ssl->input, ssl->input_len);
+				if (ssl->flags.r && !ssl->flags.q)
+					ft_printf(" %s", av[i]);
+				ft_printf("\n");
+				free(ssl->input);
+				ssl->flags.f = 1;
+			}
+		}
 		i++;
 	}
+	if (!ssl->flags.f && !ssl->flags.s)
+		if (read_stdin(ssl))
+		{
+			ssl->algorithms[ssl->algo_idx].func(ssl->input, ssl->input_len);
+			ft_printf("\n");
+		}
 }
 
 int		is_command_valid(t_ssl *ssl, char *commandName)
@@ -120,6 +210,7 @@ t_ssl	*ssl_init()
 	ssl->flags.q = 0;
 	ssl->flags.r = 0;
 	ssl->flags.s = 0;
+	ssl->flags.f = 0;
 	ssl->input_len = 0;
 	return ssl;
 }
@@ -138,7 +229,7 @@ int 	main(int argc, char **argv)
 		if (argc > 2)
 		{
 			check_command_opts(ssl, argc, argv);
-			run_command(ssl, argc,  argv);
+			//run_command(ssl, argc,  argv);
 		}
 		else
 			if (read_stdin(ssl))
