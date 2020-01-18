@@ -1,12 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_sha256.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vfil <vfil@student.unit.ua>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/18 14:58:07 by vfil              #+#    #+#             */
+/*   Updated: 2020/01/18 14:58:09 by vfil             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_sha256.h"
 
-
-void swap_and_append_data(t_sha256 *dt, unsigned int *buf)
+void		swap_and_append_data(t_sha256 *dt, unsigned int *buf)
 {
-	int 			i;
-	unsigned int tmp1;
-	unsigned int tmp2;
-	unsigned int a[8];
+	int				i;
+	unsigned int	tmp1;
+	unsigned int	tmp2;
+	unsigned int	a[8];
 
 	i = -1;
 	while (++i < 8)
@@ -14,8 +25,8 @@ void swap_and_append_data(t_sha256 *dt, unsigned int *buf)
 	i = -1;
 	while (++i < 64)
 	{
-		tmp1 = a[7] + EP1(a[4]) + CH(a[4],a[5],a[6]) + g_sha256_k[i] + buf[i];
-		tmp2 = EP0(a[0]) + MAJ(a[0],a[1],a[2]);
+		tmp1 = a[7] + EP1(a[4]) + CH(a[4], a[5], a[6]) + g_sha256_k[i] + buf[i];
+		tmp2 = EP0(a[0]) + MAJ(a[0], a[1], a[2]);
 		a[7] = a[6];
 		a[6] = a[5];
 		a[5] = a[4];
@@ -30,12 +41,11 @@ void swap_and_append_data(t_sha256 *dt, unsigned int *buf)
 		dt->h[i] += a[i];
 }
 
-
-void modify_data(t_sha256 *dt)
+void		modify_data(t_sha256 *dt)
 {
-	int 			i;
-	int 			j;
-	unsigned int 	buf[64];
+	int				i;
+	int				j;
+	unsigned int	buf[64];
 
 	i = -1;
 	j = 0;
@@ -47,13 +57,12 @@ void modify_data(t_sha256 *dt)
 	}
 	i -= 1;
 	while (++i < 64)
-		buf[i] = SIG1(buf[i - 2]) + buf[i - 7] + SIG0(buf[i - 15]) + buf[i - 16];
-
+		buf[i] = SIG1(buf[i - 2]) + buf[i - 7] +
+			SIG0(buf[i - 15]) + buf[i - 16];
 	swap_and_append_data(dt, buf);
 }
 
-
-void 	save_and_update_msg(t_sha256 *dt, char *input_msg, size_t init_len)
+void		save_and_update_msg(t_sha256 *dt, char *input_msg, size_t init_len)
 {
 	size_t	i;
 
@@ -72,8 +81,7 @@ void 	save_and_update_msg(t_sha256 *dt, char *input_msg, size_t init_len)
 	}
 }
 
-
-t_sha256	*sha256_init()
+t_sha256	*sha256_init(void)
 {
 	t_sha256		*dt;
 
@@ -88,23 +96,19 @@ t_sha256	*sha256_init()
 	dt->h[7] = 0x5be0cd19;
 	dt->datalen = 0;
 	dt->bitlen = 0;
-
-	return dt;
+	return (dt);
 }
 
-
-void	ft_sha256(char *input_msg, size_t init_len)
+void		ft_sha256(char *input_msg, size_t init_len)
 {
 	t_sha256		*dt;
 	unsigned char	hash[32];
-	int 			i;
+	int				i;
 
 	dt = sha256_init();
 	save_and_update_msg(dt, input_msg, init_len);
 	get_hash(dt, hash);
-
 	i = -1;
 	while (++i < 32)
 		ft_printf("%2.2x", hash[i]);
-
 }

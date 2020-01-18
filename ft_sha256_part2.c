@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_sha256_part2.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vfil <vfil@student.unit.ua>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/18 14:58:28 by vfil              #+#    #+#             */
+/*   Updated: 2020/01/18 14:58:30 by vfil             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_sha256.h"
 
 void	reverse_bytes(t_sha256 *dt, unsigned char *hash)
@@ -7,9 +19,9 @@ void	reverse_bytes(t_sha256 *dt, unsigned char *hash)
 	i = -1;
 	while (++i < 4)
 	{
-		hash[i]      = (dt->h[0] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 4]  = (dt->h[1] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 8]  = (dt->h[2] >> (24 - i * 8)) & 0x000000ff;
+		hash[i] = (dt->h[0] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 4] = (dt->h[1] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 8] = (dt->h[2] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 12] = (dt->h[3] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 16] = (dt->h[4] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 20] = (dt->h[5] >> (24 - i * 8)) & 0x000000ff;
@@ -17,7 +29,6 @@ void	reverse_bytes(t_sha256 *dt, unsigned char *hash)
 		hash[i + 28] = (dt->h[7] >> (24 - i * 8)) & 0x000000ff;
 	}
 }
-
 
 void	append_length_bits2padding(t_sha256 *dt)
 {
@@ -33,18 +44,19 @@ void	append_length_bits2padding(t_sha256 *dt)
 	modify_data(dt);
 }
 
-void get_hash(t_sha256 *dt, unsigned char *hash)
+void	get_hash(t_sha256 *dt, unsigned char *hash)
 {
 	unsigned int i;
 
 	i = dt->datalen;
-
-	if (dt->datalen < 56) {
+	if (dt->datalen < 56)
+	{
 		dt->data[i++] = 0x80;
 		while (i < 56)
 			dt->data[i++] = 0x00;
 	}
-	else {
+	else
+	{
 		dt->data[i++] = 0x80;
 		while (i < 64)
 			dt->data[i++] = 0x00;
